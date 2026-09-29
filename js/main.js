@@ -62,7 +62,6 @@
   /* ---------- DO MAR AO PRATO: receita passo a passo ---------- */
   var STEPS = [
     ['paso1', 'O peixe do dia chega', 'Tudo começa assim: o peixe fresco, inteiro, nas mãos de quem vai prepará-lo.'],
-    ['paso2', 'A casa veste o mar', 'Na cozinha, a equipe leva o Maravela no peito — e o peixe desenhado nas costas.'],
     ['paso3', 'Abrir com cuidado', 'Na tábua, o peixe é limpo e aberto sem pressa. Nada se perde.'],
     ['paso4', 'Filé a filé', 'A faca segue a espinha. Cada filé sai inteiro, pronto para ser fatiado.'],
     ['paso5', 'Lâminas finas', 'Fatia por fatia, o peixe cru vai desenhando o prato.'],
@@ -128,6 +127,9 @@
     new IntersectionObserver(function (es) { recVisible = es[0].isIntersecting; schedule(); if (recVisible && playing) rThumbs[cur].classList.add('playing'); }, { threshold: 0.35 }).observe(recPhoto);
   }
   go(0);
+
+  // link do site do clube: ainda não publicado
+  document.querySelectorAll('[data-club-site]').forEach(function (a) { a.addEventListener('click', function (e) { if (a.getAttribute('href') === '#') e.preventDefault(); }); });
 
   /* ---------- LUZ DE ABAJUR ---------- */
   // coordenadas em % da foto (horizontal no desktop, vertical no mobile)
