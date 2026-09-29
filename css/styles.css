@@ -285,9 +285,11 @@ body:not(.intro-done) .anim,body:not(.intro-done) .rise{opacity:0}
 .clube{background:var(--ceu);padding:90px 0 120px}
 .clube-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:80px;align-items:center}
 .clube-photo{position:relative}
-.clube-photo .ph{aspect-ratio:4/5;max-height:640px}
+.clube-photo .ph{aspect-ratio:1/1}
+.clube-photo .ph img{object-position:center 60%}
 .clube-photo:hover .ph img{transform:scale(1.06)}
-.clube-badge{position:absolute;right:-18px;top:18%;width:118px;height:118px;border-radius:999px;background:var(--verde);color:var(--papel2);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;letter-spacing:.18em;transform:rotate(-10deg);box-shadow:0 10px 30px rgba(20,77,34,.25)}
+.clube-badge{position:absolute;right:-22px;top:14%;width:124px;height:124px;border-radius:999px;border:5px solid var(--ceu);object-fit:cover;box-shadow:0 10px 30px rgba(20,77,34,.25);transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.clube-photo:hover .clube-badge{transform:rotate(360deg)}
 .clube-text{display:flex;flex-direction:column;gap:24px}
 .clube-text h2{margin-top:-6px}
 .clube-facts{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
@@ -440,7 +442,7 @@ body:not(.intro-done) .anim,body:not(.intro-done) .rise{opacity:0}
   .clube{padding:60px 0 80px}
   .clube-grid{grid-template-columns:minmax(0,1fr);gap:30px}
   .clube-photo .ph{aspect-ratio:4/3}
-  .clube-badge{width:92px;height:92px;right:8px;top:-20px;font-size:10px}
+  .clube-badge{width:88px;height:88px;right:8px;top:-22px}
   .clube-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
   .clube-text .btns{flex-direction:column}
   .btn-ig{white-space:normal}
