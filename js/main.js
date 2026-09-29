@@ -28,7 +28,6 @@
     playIntro.t = setTimeout(endIntro, 3500);
   }
   document.addEventListener('keydown', function (e) { if (document.body.classList.contains('is-intro') && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) endIntro(); });
-  $('#replay').addEventListener('click', function () { window.scrollTo(0, 0); playIntro(); });
 
   /* ---------- NAV + menu ---------- */
   var nav = $('#nav'), floatCta = $('#floatCta');
@@ -60,64 +59,75 @@
     document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
   } else { document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); }); }
 
-  /* ---------- FILETE VOCÊ MESMO ---------- */
+  /* ---------- DO MAR AO PRATO: receita passo a passo ---------- */
   var STEPS = [
     ['paso1', 'O peixe do dia chega', 'Tudo começa assim: o peixe fresco, inteiro, nas mãos de quem vai prepará-lo.'],
     ['paso2', 'A casa veste o mar', 'Na cozinha, a equipe leva o Maravela no peito — e o peixe desenhado nas costas.'],
     ['paso3', 'Abrir com cuidado', 'Na tábua, o peixe é limpo e aberto sem pressa. Nada se perde.'],
-    ['paso4', 'Filé a filé', 'A faca segue a espinha. Cada filé sai inteiro, pronto para ser laminado.'],
+    ['paso4', 'Filé a filé', 'A faca segue a espinha. Cada filé sai inteiro, pronto para ser fatiado.'],
     ['paso5', 'Lâminas finas', 'Fatia por fatia, o peixe cru vai desenhando o prato.'],
     ['paso6', 'Coalhada e picles de uva', 'A coalhada da casa faz a base; os picles de uva dão cor e acidez.'],
-    ['paso7', 'Gotas de verde', 'Azeite em pontos, como quem pinta.'],
+    ['paso7', 'Gotas de verde', 'Azeite em pontinhos, como quem pinta.'],
     ['paso8', 'O crocante de milho', 'Na pinça, a última camada: um crocante delicado de milho.'],
-    ['paso9', 'À mesa, com focaccia', 'Crudo de Peixe Branco. Agora é com você.']
+    ['paso9', 'À mesa, com focaccia', 'Pronto! Crudo de Peixe Branco, com focaccia ao lado. Agora é com você.']
   ];
-  var bg = $('#fileteBg'), strip = $('#fishStrip'), knife = $('#knife'), cutLine = $('#cutLine'), cutRect = $('#cutRect');
-  var ticks = $('#ticks'), hint = $('#cutHint'), done = $('#stepDone');
-  var imgs = STEPS.map(function (s, i) {
-    var im = new Image(); im.alt = ''; im.decoding = 'async';
-    im.src = 'img/' + s[0] + '.webp'; if (i === 0) im.className = 'on';
-    bg.appendChild(im); return im;
+  var recImgs = $('#recImgs'), recThumbs = $('#recThumbs'), recStep = document.querySelector('.rec-step');
+  var recPlayBtn = $('#recPlay'), recPhoto = $('#recPhoto');
+  var rImgs = STEPS.map(function (s, i) {
+    var im = new Image(); im.alt = s[1]; im.decoding = 'async'; im.src = 'img/' + s[0] + '.webp';
+    if (i === 0) im.className = 'on'; recImgs.appendChild(im); return im;
   });
-  var tickEls = STEPS.map(function (s, i) {
-    var t = document.createElement('i'); t.style.left = ((200 + (i + 0.5) * (950 / 9) - 150) / 1140 * 100) + '%'; ticks.appendChild(t); return t;
+  var rThumbs = STEPS.map(function (s, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'rec-thumb'; b.setAttribute('role', 'tab');
+    b.setAttribute('aria-label', 'Passo ' + (i + 1) + ': ' + s[1]);
+    var im = new Image(); im.alt = ''; im.loading = 'lazy'; im.src = 'img/' + s[0] + '.webp'; b.appendChild(im); b.appendChild(document.createElement('i'));
+    b.addEventListener('click', function () { stopAuto(); go(i); });
+    recThumbs.appendChild(b); return b;
   });
-  var X0 = 170, X1 = 1160, kx = X0, curStep = -1;
-  function setKnife(x) {
-    kx = Math.max(X0, Math.min(X1, x));
-    var p = Math.max(0, Math.min(1, (kx - 200) / 950));
-    var step = Math.min(8, Math.floor(p * 9));
-    knife.style.left = ((kx - 150) / 1140 * 100) + '%';
-    cutLine.setAttribute('d', 'M200 250 L ' + Math.max(200, kx).toFixed(1) + ' 250');
-    cutRect.setAttribute('width', (kx - X0).toFixed(1));
-    hint.classList.toggle('off', kx > 215);
-    tickEls.forEach(function (t, i) { t.classList.toggle('on', kx > 205 && i <= step); });
-    done.hidden = kx < 1130;
-    if (step !== curStep) {
-      curStep = step;
-      imgs.forEach(function (im, i) { im.classList.toggle('on', i === step); });
-      $('#stepNum').textContent = '0' + (step + 1);
-      $('#stepOf').textContent = 'PASSO ' + (step + 1) + ' DE 9';
-      $('#stepTitle').textContent = STEPS[step][1];
-      $('#stepDesc').textContent = STEPS[step][2];
-      strip.setAttribute('aria-valuenow', step + 1);
-    }
+  var cur = 0, playing = !reduce, recVisible = false, timer = 0;
+  function go(i) {
+    cur = (i + STEPS.length) % STEPS.length;
+    rImgs.forEach(function (im, k) { im.classList.toggle('on', k === cur); });
+    rThumbs.forEach(function (b, k) { b.setAttribute('aria-selected', k === cur); b.classList.remove('playing'); });
+    if (playing) { void rThumbs[cur].offsetWidth; rThumbs[cur].classList.add('playing'); }
+    $('#recNum').textContent = (cur < 9 ? '0' : '') + (cur + 1);
+    $('#recTitle').textContent = STEPS[cur][1];
+    $('#recDesc').textContent = STEPS[cur][2];
+    $('#recCount').textContent = (cur + 1) + ' / ' + STEPS.length;
+    recStep.classList.remove('swap'); void recStep.offsetWidth; recStep.classList.add('swap');
+    schedule();
   }
-  function cutFromEvent(e) {
-    var r = strip.getBoundingClientRect();
-    setKnife(150 + (e.clientX - r.left) / r.width * 1140);
+  function schedule() {
+    clearTimeout(timer);
+    if (playing && recVisible) timer = setTimeout(function () { go(cur + 1); }, 4000);
   }
-  strip.addEventListener('pointermove', cutFromEvent);
-  strip.addEventListener('pointerdown', function (e) { cutFromEvent(e); try { strip.setPointerCapture(e.pointerId); } catch (_) {} });
-  strip.addEventListener('keydown', function (e) {
-    var seg = 950 / 9;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); setKnife(kx < 200 ? 200 + seg * 0.5 : Math.min(X1, kx + seg)); }
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); setKnife(kx - seg); }
-    if (e.key === 'Home') setKnife(X0);
-    if (e.key === 'End') setKnife(X1);
+  function setPlaying(p) {
+    playing = p;
+    recPlayBtn.setAttribute('aria-pressed', p);
+    recPlayBtn.textContent = p ? '❚❚ Pausar' : '▶ Ver sozinho';
+    rThumbs.forEach(function (b, k) { b.classList.toggle('playing', p && k === cur); });
+    schedule();
+  }
+  function stopAuto() { if (playing) setPlaying(false); }
+  recPlayBtn.addEventListener('click', function () { setPlaying(!playing); });
+  ['#recNext', '#recNext2'].forEach(function (id) { $(id).addEventListener('click', function () { stopAuto(); go(cur + 1); }); });
+  ['#recPrev', '#recPrev2'].forEach(function (id) { $(id).addEventListener('click', function () { stopAuto(); go(cur - 1); }); });
+  // deslizar a foto
+  var sx = null;
+  recPhoto.addEventListener('pointerdown', function (e) { sx = e.clientX; });
+  recPhoto.addEventListener('pointerup', function (e) {
+    if (sx === null) return; var dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) > 40) { stopAuto(); go(cur + (dx < 0 ? 1 : -1)); }
   });
-  $('#cutReset').addEventListener('click', function () { setKnife(X0); strip.focus({ preventScroll: true }); });
-  setKnife(X0);
+  recPhoto.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { stopAuto(); go(cur + 1); }
+    if (e.key === 'ArrowLeft') { stopAuto(); go(cur - 1); }
+  });
+  recPhoto.tabIndex = 0;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { recVisible = es[0].isIntersecting; schedule(); if (recVisible && playing) rThumbs[cur].classList.add('playing'); }, { threshold: 0.35 }).observe(recPhoto);
+  }
+  go(0);
 
   /* ---------- LUZ DE ABAJUR ---------- */
   // coordenadas em % da foto (horizontal no desktop, vertical no mobile)
@@ -247,7 +257,7 @@
       var top = el('div', 'item-top');
       top.appendChild(el('span', 'item-name', it[0])); top.appendChild(el('span', 'item-dots')); top.appendChild(el('span', 'item-price', it[2]));
       d.appendChild(top); d.appendChild(el('span', 'item-desc', it[1]));
-      if (it[3]) { var a = el('a', 'item-chip', 'FILETE ELE VOCÊ MESMO ↑'); a.href = '#prato'; d.appendChild(a); }
+      if (it[3]) { var a = el('a', 'item-chip', 'VEJA COMO É FEITO ↑'); a.href = '#prato'; d.appendChild(a); }
       items.appendChild(d);
     });
     if (user && isMob()) tabEls[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
