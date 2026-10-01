@@ -268,7 +268,7 @@
 
   /* ---------- HORÁRIOS (hora de Maceió, UTC-3) ---------- */
   // 0=dom … 6=sáb · [abre, fecha] em horas
-  var HOURS = { 0: [[12, 18]], 1: [], 2: [[12, 16], [18, 23]], 3: [[12, 16], [18, 23]], 4: [[12, 16], [18, 23]], 5: [[12, 16], [18, 23]], 6: [[12, 16], [18, 23]] };
+  var HOURS = { 0: [[12, 16], [18, 23]], 1: [], 2: [[12, 16], [18, 23]], 3: [[12, 16], [18, 23]], 4: [[12, 16], [18, 23]], 5: [[12, 16], [18, 23]], 6: [[12, 16], [18, 23]] };
   var now = new Date(Date.now() - 3 * 3600 * 1000); // Maceió
   var wd = now.getUTCDay(), hh = now.getUTCHours() + now.getUTCMinutes() / 60;
   var openNow = HOURS[wd].some(function (h) { return hh >= h[0] && hh < h[1]; });
@@ -281,7 +281,7 @@
     [4, 'QUI', 'Almoço & jantar', '12h–16h · 18h–23h'],
     [5, 'SEX', 'Show ao vivo', '[HORÁRIO]', 'img/show.webp', 'Show ao vivo no salão'],
     [6, 'SÁB', 'DJ no almoço', '[HORÁRIO]', 'img/dj.webp', 'DJ com discotecagem de vinil'],
-    [0, 'DOM', 'Almoço longo', '12h–18h'],
+    [0, 'DOM', 'Almoço & jantar', '12h–16h · 18h–23h'],
     [1, 'SEG', 'Descanso', 'Fechado']
   ];
   var daysEl = $('#days');
