@@ -469,3 +469,8 @@ body:not(.intro-done) .anim,body:not(.intro-done) .rise{opacity:0}
   .intro{display:none}
   body:not(.intro-done) .anim,body:not(.intro-done) .rise,.reveal{opacity:1;transform:none}
 }
+
+/* crédito del desarrollador */
+.credito{position:relative;z-index:2;font-size:12px;letter-spacing:.02em;text-align:center;opacity:.8;margin:36px auto 0;padding:0 16px}
+.credito a{color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.credito a:hover{opacity:.75}
